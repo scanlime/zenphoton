@@ -186,6 +186,28 @@
             color: rgba(255, 255, 200, 0.5);
         }
 
+        textarea {
+            width: 100%;
+            background: black;
+            border: 1px solid #444;
+            min-height: 300px;
+            color: #aaa;
+        }
+
+        #evaluate-code {
+            cursor: pointer;
+            padding: 2px;
+            text-align: center;
+        }
+
+        #error-msg {
+            background: #a44;
+            color: #aaa;
+            border: #444;
+            padding: 5px 10px;
+            display: none;
+        }
+
     </style>
 </head>
 <body>
@@ -239,6 +261,56 @@
             <span class='label'>Rays traced:</span><span id='raysTraced'>0</span>
             <span class='sep'>•</span>
             <span class='label'>Speed:</span><span id='raySpeed'>0</span> rays/sec
+        </div>
+        <div class='hbox'>
+            <textarea id='code'>/**
+* Enter javascript here to programatically create walls.
+* 
+* Available variables:
+*
+*  width: width of canvas in px
+*  height: height of canvas in px
+*  cx, cy: x, y coords of light source
+*  add_wall(x0, y0, x1, y1, diffuse, reflective, transmissive): add a wall
+*     diffuse, reflective, and transmissive should all add up to 1
+*  clear_all(): clear all walls
+*  draw(): draw the scene
+**/
+
+clear_all();
+
+// Constants for you to play around with :)
+var x0          = cx
+  , y0          = cy
+  , radius0     = 100 // pixels
+  , finalRadius = 200
+  , theta0      = 0   // in radians. 2*PI = full circle
+  , segments    = 40
+  , segLength   = .5  // 1 makes a continuous spiral
+  , numCircles  = 2
+
+// calculated, cached constants
+  , deltaTheta  = (Math.PI * 2) * numCircles / segments
+  , deltaRadius = (finalRadius - radius0) / segments;
+
+// Create the walls
+for (var i=0; i < segments; i+=1) {
+    var theta1  = theta0  + i * deltaTheta
+      , theta2  = theta1  +     deltaTheta * segLength
+      , radius1 = radius0 + i * deltaRadius
+      , radius2 = radius1 +     deltaRadius;
+
+    add_wall(Math.cos(theta1) * radius1 + x0, 
+             Math.sin(theta1) * radius1 + y0, 
+             Math.cos(theta2) * radius2 + x0, 
+             Math.sin(theta2) * radius2 + y0, 
+             0, .5, .5);
+}
+draw();
+
+</textarea>
+            <div class='ui-button ui-inactive' id='evaluate-code'>Evaluate</div>
+            <div id='error-msg'></div>
         </div>
 
     </div>

@@ -55,6 +55,7 @@ class GardenUI
     constructor: (canvasId) ->
 
         @renderer = new Renderer('histogramImage')
+        window.renderer = @renderer
         @undo = new UndoTracker(@renderer)
 
         # First thing first, check compatibility. If we're good, hide the error message and show the help.
@@ -152,6 +153,14 @@ class GardenUI
                 @renderer.showSegments--
                 @renderer.redraw()
 
+        $('#code')
+            .focus (e) =>
+                @renderer.showSegments++
+                @renderer.redraw()
+            .blur (e) =>
+                @renderer.showSegments--
+                @renderer.redraw()
+
         $('#clearButton').button()
             .click (e) =>
                 return if !@renderer.segments.length and @renderer.isDefaultLightSource()
@@ -185,6 +194,25 @@ class GardenUI
             .click () =>
                 @updateLink()
                 window.prompt("Copy this URL to share your garden.", document.location)
+
+        $('#evaluate-code').button()
+            .hotkey('shift-return')
+            .click () =>
+                template = """
+                    (function(r, cx, cy){
+                        var width=r.width
+                          , height=r.height
+                          , add_wall = r.addWall.bind(r)
+                          , clear_all = r.clearAllWalls.bind(r)
+                          , draw = r.clear.bind(r);
+                        """ + $('#code')[0].value + ';})'
+                try
+                    eval(template)(@renderer, @renderer.lightX, @renderer.lightY)
+                    $('#error-msg').hide()
+                catch error
+                    $('#error-msg').html(error.message).show()
+
+
 
         # Load saved state, if any
         saved = document.location.hash.replace('#', '')

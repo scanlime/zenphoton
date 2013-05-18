@@ -263,48 +263,46 @@
             <span class='label'>Speed:</span><span id='raySpeed'>0</span> rays/sec
         </div>
         <div class='hbox'>
-            <textarea id='code'>/**
-* Enter javascript here to programatically create walls.
-* 
-* Available variables:
-*
-*  width: width of canvas in px
-*  height: height of canvas in px
-*  cx, cy: x, y coords of light source
-*  add_wall(x0, y0, x1, y1, diffuse, reflective, transmissive): add a wall
-*     diffuse, reflective, and transmissive should all add up to 1
-**/
-
+            <textarea id='config'>
 // Constants for you to play around with :)
-var x0          = cx
-  , y0          = cy
-  , radius0     = 100 // pixels
-  , finalRadius = 200
-  , theta0      = 0   // in radians. 2*PI = full circle
-  , segments    = 40
-  , segLength   = .5  // 1 makes a continuous spiral
-  , numCircles  = 2
-  , ndiffuse    = diffuse
-  , nreflective = reflective
-  , ntransmissive=transmissive
-
+scope.ctx = {
+  x0:           ['cx', 0, -100, 100],
+  y0:           ['cy', 0, -100, 100],
+  radius0:      [100, 10, 200], // pixels
+  finalRadius:  [200, 10, 400],
+  theta0:       [0, 0, Math.PI*2],   // in radians. 2*PI = full circle
+  segments:     [10, 3, 50],
+  segLength:    [1, 0,  10, 0.1],  // 1 makes a continuous spiral
+  numCircles:   [1, 0.1, 3, 0.1],
+  transmissive: [0.5, 0, 1],
+  diffuse:      [0,   0, 1],
+  reflective:   [0.5, 0, 1]
+};
+            </textarea>
+            <textarea id='code'>
 // calculated, cached constants
-  , deltaTheta  = (Math.PI * 2) * numCircles / segments
-  , deltaRadius = (finalRadius - radius0) / segments;
+var deltaTheta  = (Math.PI * 2) * c.numCircles / c.segments
+  , deltaRadius = (c.finalRadius - c.radius0) / c.segments;
 
 // Create the walls
 for (var i=0; i < segments; i+=1) {
-    var theta1  = theta0  + i * deltaTheta
-      , theta2  = theta1  +     deltaTheta * segLength
-      , radius1 = radius0 + i * deltaRadius
-      , radius2 = radius1 +     deltaRadius;
+  var theta1  = c.theta0  + i * deltaTheta
+    , theta2  = theta1    +     deltaTheta * c.segLength
+    , radius1 = c.radius0 + i * deltaRadius
+    , radius2 = radius1   +     deltaRadius + 20;
 
-    add_wall(Math.cos(theta1) * radius1 + x0, 
-             Math.sin(theta1) * radius1 + y0, 
-             Math.cos(theta2) * radius2 + x0, 
-             Math.sin(theta2) * radius2 + y0, 
-             ndiffuse, nreflective, ntransmissive);
+  add_wall(Math.cos(theta1) * radius1 + c.x0, 
+           Math.sin(theta1) * radius1 + c.y0, 
+           Math.cos(theta2) * radius2 + c.x0, 
+           Math.sin(theta2) * radius2 + c.y0, 
+           c.transmissive, c.reflective, c.diffuse);
+  add_wall(-Math.cos(theta1) * radius1 + c.x0, 
+           Math.sin(theta1) * radius1 + c.y0, 
+           -Math.cos(theta2) * radius2 + c.x0, 
+           Math.sin(theta2) * radius2 + c.y0, 
+           c.transmissive, c.reflective, c.diffuse);
 }
+            </textarea>
 
 </textarea>
             <div class='ui-button ui-inactive' id='evaluate-code'>Evaluate</div>

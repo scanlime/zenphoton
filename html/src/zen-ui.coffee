@@ -205,7 +205,7 @@ class GardenUI
         $('#evaluate-code').button()
             .hotkey('shift-return')
             .click () =>
-                @renderCode()
+                @runCode()
                 @renderer.clear()
 
 
@@ -213,8 +213,8 @@ class GardenUI
         # Load saved state, if any
         saved = document.location.hash.replace('#', '')
         if saved
-            @renderer.setStateBlob(atob(saved))
-            @exposureSlider.setValue(@renderer.exposure)
+            @getGist(saved)
+            # @exposureSlider.setValue(@renderer.exposure)
         @renderer.clear()
 
         # If the scene is empty, let our 'first run' help show through.
@@ -222,24 +222,43 @@ class GardenUI
         if @renderer.segments.length
             $('#help').hide()
 
-    renderCode: ->
-        template = """
-            (function(r, cx, cy, diffuse, reflective, transmissive){
-                var width=r.width
-                    , height=r.height
-                    , add_wall = r.addWall.bind(r);
-                """ + $('#code')[0].value + ';})'
+    runCode: () ->
+        config = $('#config')[0].value
+        code = $('#code')[0].value
+        scope =
+            ctx: null
+        eval('(function(scope){' + config + ';})')(scope)
+        c =
+            width: @renderer.width
+            height: @renderer.height
+            cx: @renderer.lightX
+            cy: @renderer.lightY
+        for own name, conf of scope.ctx
+            if typeof(conf[0]) == 'string'
+                c[name] = c[conf[0]]
+            else
+                c[name] = conf[0]
+        top = """(function(c, add_wall){"""
+        bottom = ';})'
+        code = top + code + bottom
         try
             @renderer.clearAllWalls()
-            eval(template)(@renderer, @renderer.lightX, @renderer.lightY, @material[0].value,
-                            @material[1].value, @material[2].value)
+            eval(code)(c, @renderer.addWall.bind(@renderer))
             $('#error-msg').hide()
         catch error
             $('#error-msg').html(error.message).show()
 
+    getGist: (gistname) ->
+        id = gistname.split('/')[1]
+        url = 'https://api.github.com/gists/' + id
+        rc = @runCode.bind(this)
+        $.getJSON url, (data) ->
+            $('#code')[0].value = data.files['code.js'].content
+            $('#config')[0].value = data.files['config.js'].content
+            rc()
 
     updateLink: ->
-        document.location.hash = btoa @renderer.getStateBlob()
+        # document.location.hash = btoa @renderer.getStateBlob()
 
     mouseXY: (e) ->
         o = $(@renderer.canvas).offset()

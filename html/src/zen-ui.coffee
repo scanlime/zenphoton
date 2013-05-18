@@ -153,6 +153,7 @@ class GardenUI
                 @renderer.showSegments--
                 @renderer.redraw()
 
+        @codeChanged = true
         $('#code')
             .focus (e) =>
                 @renderer.showSegments++
@@ -160,6 +161,12 @@ class GardenUI
             .blur (e) =>
                 @renderer.showSegments--
                 @renderer.redraw()
+                if @codeChanged
+                    @renderer.clear()
+                    @codeChanged = false
+            .keyup (e) =>
+                @renderCode()
+                @codeChanged = true
 
         $('#clearButton').button()
             .click (e) =>
@@ -198,19 +205,8 @@ class GardenUI
         $('#evaluate-code').button()
             .hotkey('shift-return')
             .click () =>
-                template = """
-                    (function(r, cx, cy){
-                        var width=r.width
-                          , height=r.height
-                          , add_wall = r.addWall.bind(r)
-                          , clear_all = r.clearAllWalls.bind(r)
-                          , draw = r.clear.bind(r);
-                        """ + $('#code')[0].value + ';})'
-                try
-                    eval(template)(@renderer, @renderer.lightX, @renderer.lightY)
-                    $('#error-msg').hide()
-                catch error
-                    $('#error-msg').html(error.message).show()
+                @renderCode()
+                @renderer.clear()
 
 
 
@@ -225,6 +221,22 @@ class GardenUI
         # This fades out when the first segment is drawn.
         if @renderer.segments.length
             $('#help').hide()
+
+    renderCode: ->
+        template = """
+            (function(r, cx, cy, diffuse, reflective, transmissive){
+                var width=r.width
+                    , height=r.height
+                    , add_wall = r.addWall.bind(r);
+                """ + $('#code')[0].value + ';})'
+        try
+            @renderer.clearAllWalls()
+            eval(template)(@renderer, @renderer.lightX, @renderer.lightY, @material[0].value,
+                            @material[1].value, @material[2].value)
+            $('#error-msg').hide()
+        catch error
+            $('#error-msg').html(error.message).show()
+
 
     updateLink: ->
         document.location.hash = btoa @renderer.getStateBlob()

@@ -273,11 +273,7 @@
 *  cx, cy: x, y coords of light source
 *  add_wall(x0, y0, x1, y1, diffuse, reflective, transmissive): add a wall
 *     diffuse, reflective, and transmissive should all add up to 1
-*  clear_all(): clear all walls
-*  draw(): draw the scene
 **/
-
-clear_all();
 
 // Constants for you to play around with :)
 var x0          = cx
@@ -288,6 +284,9 @@ var x0          = cx
   , segments    = 40
   , segLength   = .5  // 1 makes a continuous spiral
   , numCircles  = 2
+  , ndiffuse    = diffuse
+  , nreflective = reflective
+  , ntransmissive=transmissive
 
 // calculated, cached constants
   , deltaTheta  = (Math.PI * 2) * numCircles / segments
@@ -304,9 +303,8 @@ for (var i=0; i < segments; i+=1) {
              Math.sin(theta1) * radius1 + y0, 
              Math.cos(theta2) * radius2 + x0, 
              Math.sin(theta2) * radius2 + y0, 
-             0, .5, .5);
+             ndiffuse, nreflective, ntransmissive);
 }
-draw();
 
 </textarea>
             <div class='ui-button ui-inactive' id='evaluate-code'>Evaluate</div>

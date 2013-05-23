@@ -27,3 +27,8 @@ Contact
 -------
 
 Zen photon garden was created by [Micah Elizabeth Scott](http://scanlime.org/contact).
+
+Contributors
+------------
+
+Jared Forsyth <jared@jaredforsyth.com>

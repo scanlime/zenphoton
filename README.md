@@ -32,4 +32,3 @@ Contributors
 ------------
 
 Jared Forsyth <jared@jaredforsyth.com>
-

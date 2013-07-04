@@ -44,7 +44,7 @@
         when 'firstTrace' then @job_firstTrace msg
         when 'accumulate' then @job_accumulate msg
         when 'render' then @job_render msg
-
+        when 'reseed' then @seed = (Math.random() * 0xFFFFFFFF)|0
 
 @init = () ->
     # First-time setup
@@ -69,6 +69,9 @@
 
     # Link the asm.js module
     @AsmFn = AsmModule stdlib, {}, @heap
+
+    # Use JavaScript's PRNG to seed our fast inlined PRNG
+    @seed = (Math.random() * 0xFFFFFFFF)|0
 
     # One-time initialization done.
     @init = () -> null
@@ -120,10 +123,7 @@ alloc32 = (ptr, width, height) ->
     sceneBegin = alloc32(counts, msg.width, msg.height)
     sceneEnd = @allocScene(sceneBegin, msg.segments)
 
-    # Use JavaScript's PRNG to seed our fast inlined PRNG
-    seed = (Math.random() * 0xFFFFFFFF)|0
-
-    @AsmFn.trace(counts, msg.width, msg.height, msg.lightX, msg.lightY, msg.numRays, sceneBegin, sceneEnd, seed)
+    @AsmFn.trace(counts, msg.width, msg.height, msg.lightX, msg.lightY, msg.numRays, sceneBegin, sceneEnd, @seed)
 
 @memzero = (begin, end) ->
     # Quickly zero an area of the heap, by splatting data from a zero buffer.

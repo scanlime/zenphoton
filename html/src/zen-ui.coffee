@@ -141,7 +141,6 @@ class GardenUI
                 return if @handlingTouch
                 @renderer.arrowKeyHandler(e.keyCode)
 
-
         @material = [
             @initMaterialSlider('#diffuseSlider', 1.0),
             @initMaterialSlider('#reflectiveSlider', 0.0),

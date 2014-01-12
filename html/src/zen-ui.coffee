@@ -53,6 +53,7 @@ class UndoTracker
 
 class GardenUI
     constructor: (canvasId) ->
+        @createConfigSliders(@parseConfig())
 
         @renderer = new Renderer('histogramImage')
         window.renderer = @renderer
@@ -147,20 +148,16 @@ class GardenUI
         # Show existing segments when hovering over undo/redo/clear
         $('.show-segments-on-hover')
             .mouseenter (e) =>
-                @renderer.showSegments++
-                @renderer.redraw()
+                @showLines()
             .mouseleave (e) =>
-                @renderer.showSegments--
-                @renderer.redraw()
+                @hideLines()
 
         @codeChanged = true
         $('#code')
             .focus (e) =>
-                @renderer.showSegments++
-                @renderer.redraw()
+                @showLines()
             .blur (e) =>
-                @renderer.showSegments--
-                @renderer.redraw()
+                @hideLines()
                 if @codeChanged
                     @renderer.clear()
                     @codeChanged = false
@@ -208,8 +205,6 @@ class GardenUI
                 @runCode()
                 @renderer.clear()
 
-
-
         # Load saved state, if any
         saved = document.location.hash.replace('#', '')
         if saved
@@ -219,23 +214,22 @@ class GardenUI
 
         # If the scene is empty, let our 'first run' help show through.
         # This fades out when the first segment is drawn.
-        if @renderer.segments.length
+        if @renderer.segments.length or on
             $('#help').hide()
 
+        @runCode()
+
     runCode: () ->
-        config = $('#config')[0].value
+        ctx = @parseConfig()
         code = $('#code')[0].value
-        scope =
-            ctx: null
-        eval('(function(scope){' + config + ';})')(scope)
         c =
             width: @renderer.width
             height: @renderer.height
             cx: @renderer.lightX
             cy: @renderer.lightY
-        for own name, conf of scope.ctx
+        for own name, conf of ctx
             if typeof(conf[0]) == 'string'
-                c[name] = c[conf[0]]
+                c[name] = c[conf[0]] + conf[1]
             else
                 c[name] = conf[0]
         top = """(function(c, add_wall){"""
@@ -251,11 +245,11 @@ class GardenUI
     getGist: (gistname) ->
         id = gistname.split('/')[1]
         url = 'https://api.github.com/gists/' + id
-        rc = @runCode.bind(this)
-        $.getJSON url, (data) ->
+        $.getJSON url, (data) =>
             $('#code')[0].value = data.files['code.js'].content
-            $('#config')[0].value = data.files['config.js'].content
-            rc()
+            setConfig(data.files['config.js'].content)
+            @createConfigSliders(@parseConfig())
+            @runCode()
 
     updateLink: ->
         # document.location.hash = btoa @renderer.getStateBlob()
@@ -273,8 +267,7 @@ class GardenUI
             @material[0].value, @material[1].value, @material[2].value))
 
         @drawingSegment = true
-        @renderer.showSegments++
-        @renderer.redraw()
+        @showLines()
 
     lineToolMove: (e) ->
         # Update a line segment previously started with beginLine
@@ -287,8 +280,7 @@ class GardenUI
 
     lineToolEnd: (e) ->
         @renderer.trimSegments()
-        @renderer.showSegments--
-        @renderer.redraw()
+        @hideLines()
         @updateLink()
         @drawingSegment = false
 
@@ -312,3 +304,52 @@ class GardenUI
                     m.setValue( m.value * (1 - v) / (total - v) )
 
         return widget
+
+    showLines: () ->
+        @renderer.showSegments = 1
+        @renderer.redraw()
+
+    hideLines: () ->
+        @renderer.showSegments = 0
+        @renderer.redraw()
+
+    createConfigSliders: (json) ->
+        controls = $('#controls').empty()
+        showLines = @showLines.bind(this)
+        hideLines = @hideLines.bind(this)
+        for own key, config of json
+            vals = if typeof config[0] == 'string' then config.slice(1) else config
+            node = $("<div class='ui-box'><div class='ui-hslider'></div>" + key + '</div>')
+                     .appendTo(controls)
+            widget = new HSlider node
+            min = vals[1]
+            max = vals[2]
+            value = vals[0]
+            widget.setValue((value-min)/(max-min))
+            widget.valueChanged = @makeConfigCallback(key)
+            widget.beginChange = showLines
+            widget.endChange = hideLines
+
+    makeConfigCallback: (key) ->
+        return (v) =>
+            @setConfigValue(key, v)
+            @runCode()
+            @renderer.redraw()
+
+    parseConfig: () ->
+        return JSON.parse($('#config')[0].value)
+
+    setConfig: (value) ->
+        $('#config')[0].value = JSON.stringify(value, null, 4)
+
+    setConfigValue: (key, value) ->
+        config = @parseConfig()
+        offset = if typeof config[key][0] == 'string' then 1 else 0
+        if config[key].length >= (offset + 4)
+            step = config[key][3 + offset]
+        else
+            step = .01
+        new_value = value * (config[key][2 + offset] - config[key][1 + offset]) + config[key][1 + offset]
+        new_value = Math.floor(new_value / step) * step
+        config[key][0 + offset] = new_value
+        @setConfig(config)

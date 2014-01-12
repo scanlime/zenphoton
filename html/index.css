@@ -1,0 +1,212 @@
+@font-face {
+    font-family: 'Roboto';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Roboto Regular'), local('Roboto-Regular'), url(roboto.ttf) format('truetype');
+}
+
+body {
+    background: #111;
+    color: rgba(255, 255, 240, 0.4);
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+}
+
+h1 {
+    color: rgba(255, 255, 240, 1.0);
+    font-size: 20px;
+    padding: 0 0 0.25em 0;
+    margin: 0;
+}
+
+#centerColumn {
+    width: 1024px;
+    margin: 0 auto;
+}
+
+#workspace {
+    width: 1024px;
+    height: 576px;
+    border: 1px solid #444;
+    background: black;
+    position: relative;
+}
+
+#workspace canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#leftColumn {
+    position: absolute;
+    left: -92px;
+    top: -1px;
+    width: 88px;
+    display: none;
+}
+
+#rightColumn {
+    position: absolute;
+    left: 1028px;
+    top: -1px;
+    width: 86px;
+    display: none;
+}
+
+#leftColumn .sep {
+    display: block;
+    text-align: center;
+    color: #444;
+}
+
+#help {
+    position: absolute;
+    display: none;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 33%;
+    text-align: center;
+    font-size: 48px;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+#notsupported {
+    position: absolute;
+    display: block;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 75%;
+    text-align: center;
+}
+
+#notsupported p {
+    font-family: 'Verdana', sans-serif;
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.ui-box {
+    position: relative;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #222;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Verdana', sans-serif;
+    margin: 0 0 1px 0;
+    padding: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+
+}
+
+.ui-active {
+    background: #d79e43;
+    color: #000;
+    border: 1px solid #555;
+    border-radius: 3px;
+}
+
+.ui-inactive:hover {
+    background: #222;
+    color: #fff;
+}
+
+.ui-hslider {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 50px;
+    background: #d79e43;
+    z-index: -1;
+}
+
+.glyph {
+    float: left;
+    width: 16px;
+    padding: 0 2px 0 0;
+    text-align: center;
+}
+
+.hbox {
+    padding: 0.25em 0;
+}
+
+.hbox .label {
+    padding: 0 0.5em 0 0;
+    color: rgba(255, 255, 240, 0.2);
+}
+
+.hbox .sep {
+    padding: 0 0.5em;
+    color: rgba(255, 200, 200, 0.2);
+}
+
+#colophon {
+    float: right;
+    padding: 4px;
+    font-size: 12px;
+    font-family: 'Verdana', sans-serif;
+}
+
+a {
+    text-decoration: none;
+    color: rgba(255, 255, 200, 0.2);
+}
+
+a:hover {
+    text-decoration: none;
+    color: rgba(255, 255, 200, 0.5);
+}
+
+textarea {
+    width: 100%;
+    background: black;
+    border: 1px solid #444;
+    min-height: 300px;
+    color: #aaa;
+}
+
+#evaluate-code {
+    cursor: pointer;
+    padding: 2px;
+    text-align: center;
+}
+
+#error-msg {
+    background: #a44;
+    color: #aaa;
+    border: #444;
+    padding: 5px 10px;
+    display: none;
+}
+
+.sides {
+    position: relative;
+}
+
+#config {
+    float: left;
+    margin-right: 2%;
+    width: 73%;
+}
+
+#controls {
+    float: left;
+    width: 24%;
+    position: relative;
+}
+
+#code {
+    clear: both;
+}
+

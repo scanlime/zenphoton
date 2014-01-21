@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 set -e
 
@@ -7,7 +7,7 @@ if [[ $1 == "debug" ]]; then
     MINIFY=cat
     DEBUG_CODE=src/fakeworker-0.1.js
 else
-    MINIFY=jsmin
+    MINIFY=cat
     DEBUG_CODE=
 fi
 

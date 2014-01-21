@@ -53,7 +53,6 @@ class UndoTracker
 
 class GardenUI
     constructor: (canvasId) ->
-        @createConfigSliders(@parseConfig())
 
         @renderer = new Renderer('histogramImage')
         window.renderer = @renderer
@@ -61,7 +60,9 @@ class GardenUI
 
         # First thing first, check compatibility. If we're good, hide the error message and show the help.
         # If not, bail out now.
-        return unless @renderer.browserSupported()
+        if not @renderer.browserSupported()
+          $('#notsupported').show()
+          return
         $('#notsupported').hide()
         $('#help').show()
         $('#leftColumn, #rightColumn').fadeIn(1000)
@@ -218,6 +219,7 @@ class GardenUI
             $('#help').hide()
 
         @runCode()
+        @createConfigSliders(@parseConfig())
 
     runCode: () ->
         ctx = @parseConfig()
@@ -343,7 +345,7 @@ class GardenUI
             widget.valueChanged = @makeConfigCallback(key)
             widget.beginChange = showLines
             widget.endChange = hideAndRedraw
-        setTimeout((() ->  setConfigValuesz(json)), 50)
+        setConfigValuesz(json)
 
     makeConfigCallback: (key) ->
         return (v) =>

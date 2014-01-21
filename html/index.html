@@ -24,7 +24,7 @@
         <div id='workspace'>
             <canvas id='histogramImage'></canvas>
 
-            <div id='notsupported'>
+            <div id='notsupported' style='display:none'>
                 <h1>Oh no.</h1>
                 <p>Zen photon garden is an interactive raytracer art-toy for HTML5 browsers.</p>
                 <p>But it looks like your browser isn't supported!</p>
@@ -72,18 +72,54 @@
           <div class='sides'>
             <textarea id='config' class='hcol'>
 {
-  "x0":           ["cx", 0, -100, 100],
-  "y0":           ["cy", 0, -100, 100],
-  "xoffset":      [100, 0, 500],
-  "radius0":      [100, 10, 200],
-  "finalRadius":  [200, 10, 400],
-  "theta0":       [0, 0, 360],
-  "segments":     [10, 3, 50],
-  "segLength":    [1, 0,  10, 0.1],
-  "numCircles":   [1, 0.1, 3, 0.1],
-  "transmissive": [0.5, 0, 1],
-  "diffuse":      [0,   0, 1],
-  "reflective":   [0.5, 0, 1]
+    "radius0": [
+        28.7,
+        10,
+        200
+    ],
+    "finalRadius": [
+        6.140000000000001,
+        0,
+        20
+    ],
+    "theta0": [
+        244.94,
+        0,
+        360
+    ],
+    "segments": [
+        3,
+        1,
+        50,
+        1
+    ],
+    "segLength": [
+        3.3000000000000003,
+        0,
+        20,
+        0.1
+    ],
+    "numCircles": [
+        2,
+        0.1,
+        6,
+        1
+    ],
+    "transmissive": [
+        0,
+        0,
+        1
+    ],
+    "diffuse": [
+        0.1,
+        0,
+        1
+    ],
+    "reflective": [
+        0.17,
+        0,
+        1
+    ]
 }
               </textarea>
               <div id="controls" class='hcol show-segments-on-hover'></div>
@@ -93,26 +129,29 @@
 var deltaTheta  = (Math.PI * 2) * c.numCircles / c.segments
   , deltaRadius = (c.finalRadius - c.radius0) / c.segments;
 
-// Create the walls
-for (var i=0; i < c.segments; i+=1) {
-  var theta1  = c.theta0*Math.PI/180  + i * deltaTheta
-    , theta2  = theta1    +     deltaTheta * c.segLength
-    , radius1 = c.radius0 + i * deltaRadius
-    , radius2 = radius1   +     deltaRadius;
+var br=c.radius0,b=c.segments,d=Math.PI*2*c.numCircles/b;
+var inc = (c.finalRadius - c.radius0) / c.segments;
 
-  add_wall(Math.cos(theta1) * radius1 + c.x0 + c.xoffset,
-           Math.sin(theta1) * radius1 + c.y0,
-           Math.cos(theta2) * radius2 + c.x0 + c.xoffset,
-           Math.sin(theta2) * radius2 + c.y0,
-           c.transmissive, c.reflective, c.diffuse);
-  add_wall(-Math.cos(theta1) * radius1 + c.x0 - c.xoffset,
-           Math.sin(theta1) * radius1 + c.y0,
-           -Math.cos(theta2) * radius2 + c.x0 - c.xoffset,
-           Math.sin(theta2) * radius2 + c.y0,
-           c.transmissive, c.reflective, c.diffuse);
+function tangent(angle, radius, left, right) {
+  var cos = Math.cos(angle)
+    , sin = Math.sin(angle)
+    , cx = cos * radius + c.cx
+    , cy = sin * radius + c.cy
+    , x0 = cx - sin * left
+    , y0 = cy + cos * left
+    , x1 = cx + sin * right
+    , y1 = cy - cos * right
+  add_wall(x0, y0, x1, y1, c.diffuse, c.reflective, c.transmissive);
 }
-            </textarea>
 
+
+var rby = Math.PI*2 / c.segments
+  , r2by = (c.finalRadius - c.radius0) / c.numCircles
+for (var i=0; i<c.numCircles; i++) {
+  for (var m = 0; m<c.segments; m++) {
+    tangent(c.theta0 + m * rby + i*r2by, c.radius0 * (i/4 + .5), c.segLength*15, 0)
+  }
+}
 </textarea>
             <div class='ui-button ui-inactive' id='evaluate-code'>Evaluate</div>
             <div id='error-msg'></div>

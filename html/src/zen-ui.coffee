@@ -317,23 +317,25 @@ class GardenUI
         @renderer.clear()
         @hideLines()
 
-    setConfigValues: (json) ->
+    setConfigValuesz: (json) ->
         for own key, widget of @sliders
-            vals = if typeof config[0] == 'string' then config.slice(1) else config
-            widget.setValue((vals[0] - vals[1])/(vals[2]-vals[1]))
+            mench = json[key]
+            moo = if typeof mench[0] == 'string' then mench.slice(1) else mench
+            widget.setValue((moo[0] - moo[1])/(moo[2]-moo[1]))
 
     createConfigSliders: (json) ->
         controls = $('#controls').empty()
         showLines = @showLines.bind(this)
         hideLines = @hideLines.bind(this)
         hideAndRedraw = @hideAndRedraw.bind(this)
-        # setConfigValues = @setConfigValues.bind(this)
-        # @sliders = {}
+        setConfigValuesz = @setConfigValuesz.bind(this)
+        @sliders = {}
         for own key, config of json
             vals = if typeof config[0] == 'string' then config.slice(1) else config
             node = $("<div class='ui-box'><div class='ui-hslider'></div>" + key + '</div>')
                      .appendTo(controls)
             widget = new HSlider node
+            @sliders[key] = widget
             min = vals[1]
             max = vals[2]
             value = vals[0]
@@ -341,7 +343,7 @@ class GardenUI
             widget.valueChanged = @makeConfigCallback(key)
             widget.beginChange = showLines
             widget.endChange = hideAndRedraw
-        # setTimeout((() ->  setConfigValues(json)), 50)
+        setTimeout((() ->  setConfigValuesz(json)), 50)
 
     makeConfigCallback: (key) ->
         return (v) =>

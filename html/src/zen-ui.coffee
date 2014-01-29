@@ -191,12 +191,17 @@ class GardenUI
                 @exposureSlider.setValue(@renderer.exposure)
                 @updateLink()
 
+        $('#reloadControls').button()
+            .click () =>
+                @reloadConfigSliders()
+
         $('#pngButton').button()
             .click () =>
                 document.location.href = @renderer.toDataURL('image/png').replace('image/png', 'image/octet-stream')
 
         $('#linkButton').button()
             .click () =>
+                e.stopPropagation()
                 @updateLink()
                 window.prompt("Copy this URL to share your garden.", document.location)
 
@@ -219,6 +224,9 @@ class GardenUI
             $('#help').hide()
 
         @runCode()
+        @createConfigSliders(@parseConfig())
+
+    reloadConfigSliders: () ->
         @createConfigSliders(@parseConfig())
 
     runCode: () ->

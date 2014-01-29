@@ -191,19 +191,16 @@ textarea {
 }
 
 .sides {
-    position: relative;
+    display: flex;
 }
 
 #config {
-    float: left;
-    margin-right: 2%;
-    width: 73%;
+	flex: 1;
 }
 
-#controls {
-    float: left;
-    width: 24%;
-    position: relative;
+.controls-side {
+	width: 200px;
+	margin-left: 10px;
 }
 
 #code {

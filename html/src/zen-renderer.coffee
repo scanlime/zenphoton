@@ -163,6 +163,9 @@ class Renderer
                 @interactive.postMessage($.extend(msg, {'job': 'accumulate'}), [msg.counts])
                 @asyncRender()
 
+                @interactive.postMessage @sceneMessage
+                    job: 'reseed'
+
             # Can we begin a firstTrace now?
             if @interactive._numPending == 0 and @interactive._cookie < @latestCookie
                 @firstTrace()
@@ -240,6 +243,8 @@ class Renderer
         for w in @batch
             continue if w._numPending
             w._numPending++
+            w.postMessage @sceneMessage
+                job: 'reseed'
             w.postMessage @sceneMessage
                 job: 'trace'
                 numRays: numRays

@@ -21,4 +21,4 @@ FILES="\
     robots.txt                         \
     roboto.ttf                         "
 
-scp $FILES scanlime@scanlime.org:~/zenphoton.com/
+rsync -v $FILES matthias@paquari.com:/usr/share/nginx/html/zenphoton.com/

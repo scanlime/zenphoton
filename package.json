@@ -1,0 +1,36 @@
+{
+  "name": "zenphoton",
+  "version": "1.0.0",
+  "repository": "https://github.com/shuuuuun/zenphoton.git",
+  "license": "MIT",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "scripts": {
+    "start": "npm run watch",
+    "build": "npm run build-main & npm run build-rayworker & npm run build-rayworker-asm",
+    "build-main": "browserify _src/js/entry.js | uglifyjs --comments > public/js/zenphoton.js",
+    "build-rayworker": "browserify _src/js/rayworker.js | uglifyjs --comments > public/js/rayworker.js",
+    "build-rayworker-asm": "browserify _src/js/rayworker-asm.js | uglifyjs --comments > public/js/rayworker-asm.js",
+    "build-debug": "browserify _src/js/entry.js -o public/js/zenphoton.js",
+    "watch": "npm run watch-main & npm run watch-rayworker & npm run watch-rayworker-asm",
+    "watch-main": "watchify _src/js/entry.js -o 'uglifyjs --comments > public/js/zenphoton.js' --verbose",
+    "watch-rayworker": "watchify _src/js/rayworker.js -o 'uglifyjs --comments > public/js/rayworker.js' --verbose",
+    "watch-rayworker-asm": "watchify _src/js/rayworker-asm.js -o 'uglifyjs --comments > public/js/rayworker-asm.js' --verbose",
+    "watch-debug": "watchify _src/js/entry.js -o public/js/zenphoton.js --verbose"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "coffee-script": "^1.10.0",
+    "coffeeify": "^2.0.1",
+    "jquery": "^3.1.0",
+    "jsmin": "^1.0.1",
+    "uglifyjs": "^2.4.10",
+    "watchify": "^3.7.0"
+  },
+  "browserify": {
+    "transform": [
+      "coffeeify"
+    ]
+  }
+}

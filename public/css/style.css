@@ -1,0 +1,39 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: #111;
+    color: rgba(255, 255, 240, 0.4);
+    font-size: 16px;
+    font-family: Futura, sans-serif;
+}
+
+h1 {
+    color: rgba(255, 255, 240, 1.0);
+    font-size: 20px;
+    padding: 0 0 0.25em 0;
+    margin: 0;
+}
+
+#centerColumn {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+#workspace {
+    width: 100%;
+    height: 100%;
+    background: black;
+    position: relative;
+}
+
+#workspace canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}

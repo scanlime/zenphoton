@@ -323,6 +323,17 @@ class Renderer
         speed = @raysTraced / t
         @speedEstimate += (speed - @speedEstimate) * 0.1
 
+    arrowKeyHandler: (key) =>
+        @firstTrace()
+        if key == 37 and @lightX - 5 > 0
+            @lightX -= 5
+        if key == 39 and @lightX + 5 < @width
+            @lightX += 5
+        if key == 38 and @lightY - 5 > 0
+            @lightY -= 5
+        if key == 40 and @lightY + 5 < @height
+            @lightY += 5
+
     getState: ->
         return [
             @exposure,

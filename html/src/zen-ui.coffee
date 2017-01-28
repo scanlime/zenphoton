@@ -137,6 +137,10 @@ class GardenUI
                     @renderer.clear()
                     e.preventDefault()
 
+            .keydown (e) =>
+                return if @handlingTouch
+                @renderer.arrowKeyHandler(e.keyCode)
+
         @material = [
             @initMaterialSlider('#diffuseSlider', 1.0),
             @initMaterialSlider('#reflectiveSlider', 0.0),
@@ -157,7 +161,6 @@ class GardenUI
                 return if !@renderer.segments.length and @renderer.isDefaultLightSource()
                 @undo.checkpoint()
                 @renderer.segments = []
-                @renderer.setDefaultLightSource()
                 @renderer.clear()
                 @updateLink()
 

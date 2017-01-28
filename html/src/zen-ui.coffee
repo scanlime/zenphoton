@@ -56,6 +56,7 @@ class GardenUI
 
         @renderer = new Renderer('histogramImage')
         @undo = new UndoTracker(@renderer)
+        @lineMoveCallbacks = []
 
         # First thing first, check compatibility. If we're good, hide the error message and show the help.
         # If not, bail out now.
@@ -212,6 +213,26 @@ class GardenUI
         [x, y] = @mouseXY e
         @renderer.segments.push(new Segment(x, y, x, y,
             @material[0].value, @material[1].value, @material[2].value))
+        @lineMoveCallbacks.push(((s) ->
+            return (x, y) ->
+                s.x1 = x
+                s.y1 = y
+        )(@renderer.segments[@renderer.segments.length - 1]))
+        mirrorX = $('#mirrorXCheckbox').prop('checked')
+        mirrorY = $('#mirrorYCheckbox').prop('checked')
+        if mirrorX or mirrorY
+            mcb = (s, mirrorX, mirrorY, aboutX, aboutY) ->
+                return (x, y) ->
+                    s.x1 = if mirrorX then aboutX * 2 - x else x
+                    s.y1 = if mirrorY then aboutY * 2 - y else y
+            o = {}
+            f = mcb o, mirrorX, mirrorY, @renderer.lightX, @renderer.lightY
+            f x, y
+            @renderer.segments.push(new Segment(o.x1, o.y1, o.x1, o.y1,
+                @material[0].value, @material[1].value, @material[2].value))
+            @lineMoveCallbacks.push(mcb(
+                @renderer.segments[@renderer.segments.length - 1],
+                mirrorX, mirrorY, @renderer.lightX, @renderer.lightY))
 
         @drawingSegment = true
         @renderer.showSegments++
@@ -220,13 +241,15 @@ class GardenUI
     lineToolMove: (e) ->
         # Update a line segment previously started with beginLine
 
-        s = @renderer.segments[@renderer.segments.length - 1]
-        [s.x1, s.y1] = @mouseXY e
+        [x, y] = @mouseXY e
+        for cb in @lineMoveCallbacks
+            cb(x, y)
 
         @renderer.clear()   # Asynchronously start rendering the new scene
         @renderer.redraw()  # Immediately draw the updated segments
 
     lineToolEnd: (e) ->
+        @lineMoveCallbacks = []
         @renderer.trimSegments()
         @renderer.showSegments--
         @renderer.redraw()

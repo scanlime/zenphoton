@@ -14,179 +14,7 @@
     <link rel="apple-touch-icon" sizes="144x144" href="logo-144.png" />
     <link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" />
     <script src='zenphoton.js' type='text/javascript'></script>
-    <style>
-
-        @font-face {
-            font-family: 'Roboto';
-            font-style: normal;
-            font-weight: 400;
-            src: local('Roboto Regular'), local('Roboto-Regular'), url(roboto.ttf) format('truetype');
-        }
-
-        body {
-            background: #111;
-            color: rgba(255, 255, 240, 0.4);
-            font-size: 16px;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        h1 {
-            color: rgba(255, 255, 240, 1.0);
-            font-size: 20px;
-            padding: 0 0 0.25em 0;
-            margin: 0;
-        }
-
-        #centerColumn {
-            width: 1024px;
-            margin: 0 auto;
-        }
-
-        #workspace {
-            width: 1024px;
-            height: 576px;
-            border: 1px solid #444;
-            background: black;
-            position: relative;
-        }
-
-        #workspace canvas {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        #leftColumn {
-            position: absolute;
-            left: -92px;
-            top: -1px;
-            width: 88px;
-            display: none;
-        }
-
-        #rightColumn {
-            position: absolute;
-            left: 1028px;
-            top: -1px;
-            width: 86px;
-            display: none;
-        }
-
-        #leftColumn .sep {
-            display: block;
-            text-align: center;
-            color: #444;
-        }
-
-        #help {
-            position: absolute;
-            display: none;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 33%;
-            text-align: center;
-            font-size: 48px;
-            color: rgba(0, 0, 0, 0.8);
-        }
-
-        #notsupported {
-            position: absolute;
-            display: block;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: 75%;
-            text-align: center;
-        }
-
-        #notsupported p {
-            font-family: 'Verdana', sans-serif;
-            font-size: 20px;
-            color: rgba(255, 255, 255, 0.35);
-        }
-
-        .ui-box {
-            position: relative;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #222;
-            border-radius: 3px;
-            font-size: 12px;
-            font-family: 'Verdana', sans-serif;
-            margin: 0 0 1px 0;
-            padding: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-            -moz-user-select: none;
-            -khtml-user-select: none;
-            -webkit-user-select: none;
-            user-select: none;
-
-        }
-
-        .ui-active {
-            background: #d79e43;
-            color: #000;
-            border: 1px solid #555;
-            border-radius: 3px;
-        }
-
-        .ui-inactive:hover {
-            background: #222;
-            color: #fff;
-        }
-
-        .ui-hslider {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 50px;
-            background: #d79e43;
-            z-index: -1;
-        }
-
-        .glyph {
-            float: left;
-            width: 16px;
-            padding: 0 2px 0 0;
-            text-align: center;
-        }
-
-        .hbox {
-            padding: 0.25em 0;
-        }
-
-        .hbox .label {
-            padding: 0 0.5em 0 0;
-            color: rgba(255, 255, 240, 0.2);
-        }
-
-        .hbox .sep {
-            padding: 0 0.5em;
-            color: rgba(255, 200, 200, 0.2);
-        }
-
-        #colophon {
-            float: right;
-            padding: 4px;
-            font-size: 12px;
-            font-family: 'Verdana', sans-serif;
-        }
-
-        a {
-            text-decoration: none;
-            color: rgba(255, 255, 200, 0.2);
-        }
-
-        a:hover {
-            text-decoration: none;
-            color: rgba(255, 255, 200, 0.5);
-        }
-
-    </style>
+    <link rel="stylesheet" href="index.css" type="text/css" />
 </head>
 <body>
     <div id='centerColumn'>
@@ -196,7 +24,7 @@
         <div id='workspace'>
             <canvas id='histogramImage'></canvas>
 
-            <div id='notsupported'>
+            <div id='notsupported' style='display:none'>
                 <h1>Oh no.</h1>
                 <p>Zen photon garden is an interactive raytracer art-toy for HTML5 browsers.</p>
                 <p>But it looks like your browser isn't supported!</p>
@@ -239,6 +67,111 @@
             <span class='label'>Rays traced:</span><span id='raysTraced'>0</span>
             <span class='sep'>•</span>
             <span class='label'>Speed:</span><span id='raySpeed'>0</span> rays/sec
+        </div>
+        <div class='hbox'>
+          <div class='sides'>
+            <textarea id='config' class='hcol'>
+{
+    "radius0": [
+        128.98,
+        10,
+        200
+    ],
+    "finalRadius": [
+        8.98,
+        0,
+        20
+    ],
+    "angle": [
+        99.09,
+        0,
+        180
+    ],
+    "centering": [
+        0.61,
+        0,
+        1
+    ],
+    "theta0": [
+        244.94,
+        0,
+        360
+    ],
+    "segments": [
+        6,
+        1,
+        50,
+        1
+    ],
+    "segLength": [
+        4.2,
+        0,
+        20,
+        0.1
+    ],
+    "numCircles": [
+        3,
+        0.1,
+        6,
+        1
+    ],
+    "transmissive": [
+        0.52,
+        0,
+        1
+    ],
+    "diffuse": [
+        0.1,
+        0,
+        1
+    ],
+    "reflective": [
+        0.99,
+        0,
+        1
+    ]
+}
+              </textarea>
+	      <div class='controls-side'>
+              <div id="controls" class='hcol show-segments-on-hover'></div>
+              <div class='ui-box ui-inactive' id='reloadControls'>Reload Controls</div>
+      </div>
+	      
+            </div>
+            <textarea id='code'>
+// calculated, cached constants
+var deltaTheta  = (Math.PI * 2) * c.numCircles / c.segments
+  , deltaRadius = (c.finalRadius - c.radius0) / c.segments;
+
+var br=c.radius0,b=c.segments,d=Math.PI*2*c.numCircles/b;
+var inc = (c.finalRadius - c.radius0) / c.segments;
+
+function tangent(angle, radius, left, right, off_angle) {
+  var cos = Math.cos(angle)
+    , sin = Math.sin(angle)
+    , coff = Math.cos(angle + off_angle)
+    , soff = Math.sin(angle + off_angle)
+    , cx = cos * radius + c.cx
+    , cy = sin * radius + c.cy
+    , x0 = cx - soff * left
+    , y0 = cy + coff * left
+    , x1 = cx + soff * right
+    , y1 = cy - coff * right
+  add_wall(x0, y0, x1, y1, c.diffuse, c.reflective, c.transmissive);
+}
+
+
+var rby = Math.PI*2 / c.segments
+  , r2by = (c.finalRadius - c.radius0) / c.numCircles
+for (var i=0; i<c.numCircles; i++) {
+  for (var m = 0; m<c.segments; m++) {
+    tangent(c.theta0 + m * rby + i*r2by, c.radius0 * (i/4 + .5), c.segLength*15 * c.centering, c.segLength * 15 * (1 -  c.centering), c.angle / 180 * Math.PI)
+  }
+}
+
+</textarea>
+            <div class='ui-button ui-inactive' id='evaluate-code'>Evaluate</div>
+            <div id='error-msg'></div>
         </div>
 
     </div>

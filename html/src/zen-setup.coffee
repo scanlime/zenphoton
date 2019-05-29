@@ -26,6 +26,8 @@
 #
 
 $(document).ready(() ->
-    ui = new GardenUI
-    ui.renderer.start()
+    setTimeout((()->
+      ui = new GardenUI
+      ui.renderer.start()
+    ), 50)
 )

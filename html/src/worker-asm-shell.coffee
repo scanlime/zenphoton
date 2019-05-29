@@ -138,7 +138,7 @@ alloc32 = (ptr, width, height) ->
             @U32.set(@Z32, begin >> 2)
             begin += 0x10000
         else
-            @U32.set(@Z32.slice(0, l >> 2), begin >> 2)
+            @U32.set(@Z32.subarray(0, l >> 2), begin >> 2)
             begin += l
 
 

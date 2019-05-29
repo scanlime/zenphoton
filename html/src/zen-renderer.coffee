@@ -211,6 +211,14 @@ class Renderer
         @lightX = Math.min( @width - 2, Math.max( 1, xy[0] ))
         @lightY = Math.min( @height - 2, Math.max( 1, xy[1] ))
 
+    addWall: (x0, y0, x1, y1, diffuse, reflective, transmissive) ->
+        if !diffuse and !reflective and !transmissive
+            diffuse = 1; reflective = 0; transmissive = 0;
+        @segments.push(new Segment(x0, y0, x1, y1, diffuse, reflective, transmissive))
+
+    clearAllWalls: ->
+        @segments = []
+
     setDefaultWalls: ->
         @walls = [
             new Segment(0, 0, @width-1, 0, 0,0,0),

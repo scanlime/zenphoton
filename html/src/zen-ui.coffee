@@ -55,11 +55,14 @@ class GardenUI
     constructor: (canvasId) ->
 
         @renderer = new Renderer('histogramImage')
+        window.renderer = @renderer
         @undo = new UndoTracker(@renderer)
 
         # First thing first, check compatibility. If we're good, hide the error message and show the help.
         # If not, bail out now.
-        return unless @renderer.browserSupported()
+        if not @renderer.browserSupported()
+          $('#notsupported').show()
+          return
         $('#notsupported').hide()
         $('#help').show()
         $('#leftColumn, #rightColumn').fadeIn(1000)
@@ -146,11 +149,22 @@ class GardenUI
         # Show existing segments when hovering over undo/redo/clear
         $('.show-segments-on-hover')
             .mouseenter (e) =>
-                @renderer.showSegments++
-                @renderer.redraw()
+                @showLines()
             .mouseleave (e) =>
-                @renderer.showSegments--
-                @renderer.redraw()
+                @hideLines()
+
+        @codeChanged = true
+        $('#code')
+            .focus (e) =>
+                @showLines()
+            .blur (e) =>
+                @hideLines()
+                if @codeChanged
+                    @renderer.clear()
+                    @codeChanged = false
+            .keyup (e) =>
+                @runCode()
+                @codeChanged = true
 
         $('#clearButton').button()
             .click (e) =>
@@ -177,29 +191,78 @@ class GardenUI
                 @exposureSlider.setValue(@renderer.exposure)
                 @updateLink()
 
+        $('#reloadControls').button()
+            .click () =>
+                @reloadConfigSliders()
+
         $('#pngButton').button()
             .click () =>
                 document.location.href = @renderer.toDataURL('image/png').replace('image/png', 'image/octet-stream')
 
         $('#linkButton').button()
             .click () =>
+                e.stopPropagation()
                 @updateLink()
                 window.prompt("Copy this URL to share your garden.", document.location)
+
+        $('#evaluate-code').button()
+            .hotkey('shift-return')
+            .click () =>
+                @runCode()
+                @renderer.clear()
 
         # Load saved state, if any
         saved = document.location.hash.replace('#', '')
         if saved
-            @renderer.setStateBlob(atob(saved))
-            @exposureSlider.setValue(@renderer.exposure)
+            @getGist(saved)
+            # @exposureSlider.setValue(@renderer.exposure)
         @renderer.clear()
 
         # If the scene is empty, let our 'first run' help show through.
         # This fades out when the first segment is drawn.
-        if @renderer.segments.length
+        if @renderer.segments.length or on
             $('#help').hide()
 
+        @runCode()
+        @createConfigSliders(@parseConfig())
+
+    reloadConfigSliders: () ->
+        @createConfigSliders(@parseConfig())
+
+    runCode: () ->
+        ctx = @parseConfig()
+        code = $('#code')[0].value
+        c =
+            width: @renderer.width
+            height: @renderer.height
+            cx: @renderer.lightX
+            cy: @renderer.lightY
+        for own name, conf of ctx
+            if typeof(conf[0]) == 'string'
+                c[name] = c[conf[0]] + conf[1]
+            else
+                c[name] = conf[0]
+        top = """(function(c, add_wall){"""
+        bottom = ';})'
+        code = top + code + bottom
+        try
+            @renderer.clearAllWalls()
+            eval(code)(c, @renderer.addWall.bind(@renderer))
+            $('#error-msg').hide()
+        catch error
+            $('#error-msg').html(error.message).show()
+
+    getGist: (gistname) ->
+        id = gistname.split('/')[1]
+        url = 'https://api.github.com/gists/' + id
+        $.getJSON url, (data) =>
+            $('#code')[0].value = data.files['code.js'].content
+            setConfig(data.files['config.js'].content)
+            @createConfigSliders(@parseConfig())
+            @runCode()
+
     updateLink: ->
-        document.location.hash = btoa @renderer.getStateBlob()
+        # document.location.hash = btoa @renderer.getStateBlob()
 
     mouseXY: (e) ->
         o = $(@renderer.canvas).offset()
@@ -214,8 +277,7 @@ class GardenUI
             @material[0].value, @material[1].value, @material[2].value))
 
         @drawingSegment = true
-        @renderer.showSegments++
-        @renderer.redraw()
+        @showLines()
 
     lineToolMove: (e) ->
         # Update a line segment previously started with beginLine
@@ -228,8 +290,7 @@ class GardenUI
 
     lineToolEnd: (e) ->
         @renderer.trimSegments()
-        @renderer.showSegments--
-        @renderer.redraw()
+        @hideLines()
         @updateLink()
         @drawingSegment = false
 
@@ -253,3 +314,67 @@ class GardenUI
                     m.setValue( m.value * (1 - v) / (total - v) )
 
         return widget
+
+    showLines: () ->
+        @renderer.showSegments = 1
+        @renderer.redraw()
+
+    hideLines: () ->
+        @renderer.showSegments = 0
+        @renderer.redraw()
+
+    hideAndRedraw: () ->
+        @renderer.clear()
+        @hideLines()
+
+    setConfigValuesz: (json) ->
+        for own key, widget of @sliders
+            mench = json[key]
+            moo = if typeof mench[0] == 'string' then mench.slice(1) else mench
+            widget.setValue((moo[0] - moo[1])/(moo[2]-moo[1]))
+
+    createConfigSliders: (json) ->
+        controls = $('#controls').empty()
+        showLines = @showLines.bind(this)
+        hideLines = @hideLines.bind(this)
+        hideAndRedraw = @hideAndRedraw.bind(this)
+        setConfigValuesz = @setConfigValuesz.bind(this)
+        @sliders = {}
+        for own key, config of json
+            vals = if typeof config[0] == 'string' then config.slice(1) else config
+            node = $("<div class='ui-box'><div class='ui-hslider'></div>" + key + '</div>')
+                     .appendTo(controls)
+            widget = new HSlider node
+            @sliders[key] = widget
+            min = vals[1]
+            max = vals[2]
+            value = vals[0]
+            widget.setValue(0)
+            widget.valueChanged = @makeConfigCallback(key)
+            widget.beginChange = showLines
+            widget.endChange = hideAndRedraw
+        setConfigValuesz(json)
+
+    makeConfigCallback: (key) ->
+        return (v) =>
+            @setConfigValue(key, v)
+            @runCode()
+            @renderer.redraw()
+
+    parseConfig: () ->
+        return JSON.parse($('#config')[0].value)
+
+    setConfig: (value) ->
+        $('#config')[0].value = JSON.stringify(value, null, 4)
+
+    setConfigValue: (key, value) ->
+        config = @parseConfig()
+        offset = if typeof config[key][0] == 'string' then 1 else 0
+        if config[key].length >= (offset + 4)
+            step = config[key][3 + offset]
+        else
+            step = .01
+        new_value = value * (config[key][2 + offset] - config[key][1 + offset]) + config[key][1 + offset]
+        new_value = Math.floor(new_value / step) * step
+        config[key][0 + offset] = new_value
+        @setConfig(config)

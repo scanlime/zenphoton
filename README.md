@@ -1,6 +1,8 @@
 Zen photon garden
 =================
 
+![screenshot](media/screenshot.png)
+
 This is a little HTML5 art toy about raytracing.
 
 It's built for modern web browsers with a fast JavaScript engine, Web Workers, Typed Arrays, and Canvas.
@@ -30,3 +32,8 @@ Contact
 -------
 
 Zen photon garden was created by [Micah Elizabeth Scott](http://scanlime.org/contact).
+
+Contributors
+------------
+
+Jared Forsyth <jared@jaredforsyth.com>

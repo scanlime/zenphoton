@@ -136,6 +136,7 @@ class HSlider
 
             .mouseup (e) =>
                 return if @touchDragging
+                return unless @dragging
                 @endDrag()
 
     beginDrag: (pageX) ->

@@ -73,14 +73,24 @@
             <textarea id='config' class='hcol'>
 {
     "radius0": [
-        28.7,
+        128.98,
         10,
         200
     ],
     "finalRadius": [
-        6.140000000000001,
+        8.98,
         0,
         20
+    ],
+    "angle": [
+        99.09,
+        0,
+        180
+    ],
+    "centering": [
+        0.61,
+        0,
+        1
     ],
     "theta0": [
         244.94,
@@ -88,25 +98,25 @@
         360
     ],
     "segments": [
-        3,
+        6,
         1,
         50,
         1
     ],
     "segLength": [
-        3.3000000000000003,
+        4.2,
         0,
         20,
         0.1
     ],
     "numCircles": [
-        2,
+        3,
         0.1,
         6,
         1
     ],
     "transmissive": [
-        0,
+        0.52,
         0,
         1
     ],
@@ -116,7 +126,7 @@
         1
     ],
     "reflective": [
-        0.17,
+        0.99,
         0,
         1
     ]
@@ -136,15 +146,17 @@ var deltaTheta  = (Math.PI * 2) * c.numCircles / c.segments
 var br=c.radius0,b=c.segments,d=Math.PI*2*c.numCircles/b;
 var inc = (c.finalRadius - c.radius0) / c.segments;
 
-function tangent(angle, radius, left, right) {
+function tangent(angle, radius, left, right, off_angle) {
   var cos = Math.cos(angle)
     , sin = Math.sin(angle)
+    , coff = Math.cos(angle + off_angle)
+    , soff = Math.sin(angle + off_angle)
     , cx = cos * radius + c.cx
     , cy = sin * radius + c.cy
-    , x0 = cx - sin * left
-    , y0 = cy + cos * left
-    , x1 = cx + sin * right
-    , y1 = cy - cos * right
+    , x0 = cx - soff * left
+    , y0 = cy + coff * left
+    , x1 = cx + soff * right
+    , y1 = cy - coff * right
   add_wall(x0, y0, x1, y1, c.diffuse, c.reflective, c.transmissive);
 }
 
@@ -153,9 +165,10 @@ var rby = Math.PI*2 / c.segments
   , r2by = (c.finalRadius - c.radius0) / c.numCircles
 for (var i=0; i<c.numCircles; i++) {
   for (var m = 0; m<c.segments; m++) {
-    tangent(c.theta0 + m * rby + i*r2by, c.radius0 * (i/4 + .5), c.segLength*15, 0)
+    tangent(c.theta0 + m * rby + i*r2by, c.radius0 * (i/4 + .5), c.segLength*15 * c.centering, c.segLength * 15 * (1 -  c.centering), c.angle / 180 * Math.PI)
   }
 }
+
 </textarea>
             <div class='ui-button ui-inactive' id='evaluate-code'>Evaluate</div>
             <div id='error-msg'></div>

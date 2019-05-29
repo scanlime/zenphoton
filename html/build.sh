@@ -2,6 +2,8 @@
 
 set -e
 
+COFFEE=../node_modules/.bin/coffee
+
 if [[ $1 == "debug" ]]; then
     echo Debug build, not minified.
     MINIFY=cat
@@ -15,7 +17,7 @@ fi
 (
     cat src/header.js
     (
-        coffee -c -p src/worker-noasm.coffee
+        $COFFEE -c -p src/worker-noasm.coffee
     ) | $MINIFY
 ) > rayworker.js
 
@@ -24,7 +26,7 @@ fi
     cat src/header.js
     (
         cat src/worker-asm-core.js
-        coffee -c -p src/worker-asm-shell.coffee
+        $COFFEE -c -p src/worker-asm-shell.coffee
     ) | $MINIFY
 ) > rayworker-asm.js
 
@@ -44,6 +46,6 @@ fi
                 src/zen-widgets.coffee \
                 src/zen-ui.coffee \
                 src/zen-setup.coffee
-        ) | coffee -p -s
+        ) | $COFFEE -p -s
     ) | $MINIFY
 ) > zenphoton.js

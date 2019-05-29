@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "coffeescript": "^2.4.1",
+    "jsmin": "^1.0.1"
+  },
+  "scripts": {
+    "build": "cd html && ./build.sh",
+    "start": "cd html && http-server -p 3113"
+  }
+}
